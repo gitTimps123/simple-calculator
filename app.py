@@ -1,24 +1,37 @@
 import streamlit as st
+from decimal import Decimal, getcontext
 
-st.title("Simple Calculator")
+# High precision (professional-grade)
+getcontext().prec = 28
 
-num1 = st.number_input("Enter first number", value=0.0)
-num2 = st.number_input("Enter second number", value=0.0)
+st.title("Professional Calculator (Accurate)")
+
+num1 = st.text_input("Enter first number", "0")
+num2 = st.text_input("Enter second number", "0")
 
 operation = st.selectbox(
     "Choose operation",
     ["Add", "Subtract", "Multiply", "Divide"]
 )
 
+def calculate(a, b, op):
+    a = Decimal(a)
+    b = Decimal(b)
+
+    if op == "Add":
+        return a + b
+    elif op == "Subtract":
+        return a - b
+    elif op == "Multiply":
+        return a * b
+    elif op == "Divide":
+        if b == 0:
+            raise ValueError("Cannot divide by zero")
+        return a / b
+
 if st.button("Calculate"):
-    if operation == "Add":
-        st.success(num1 + num2)
-    elif operation == "Subtract":
-        st.success(num1 - num2)
-    elif operation == "Multiply":
-        st.success(num1 * num2)
-    elif operation == "Divide":
-        if num2 == 0:
-            st.error("Cannot divide by zero")
-        else:
-            st.success(num1 / num2)
+    try:
+        result = calculate(num1, num2, operation)
+        st.success(f"Result: {result.normalize()}")
+    except Exception as e:
+        st.error(f"Error: {e}")
